@@ -1,8 +1,5 @@
 package log
 
-import (
-	"github.com/robfig/cron/v3"
-)
 const (
 	STDOUT_NONE					= "%s"
 	STDOUT_GREEN				= "%c[1;40;32m%s%c[0m"

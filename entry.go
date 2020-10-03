@@ -16,6 +16,7 @@ var p sync.Pool
 
 type Entry struct {
 	Data			map[string]string
+	level			Level
 	buf				bytes.Buffer
 }
 
@@ -25,8 +26,9 @@ func init() {
 	}}
 }
 
-func newEntry() *Entry {
+func newEntry(level Level) *Entry {
 	o := p.Get().(*Entry)
+	o.level = level
 	o.getCaller()
 	return o
 }
@@ -48,7 +50,7 @@ func (e *Entry) getCaller() {
 		e.Data[TIPS_FUNC] = funcName
 	}
 	e.Data[TIPS_TIME] = time.Now().Format(TIME_FORMAT)
-	e.Data[TIPS_LEVEL] = levelTip[log.Level]
+	e.Data[TIPS_LEVEL] = levelTip[e.level]
 }
 
 func (e *Entry) opHook() {
@@ -99,7 +101,7 @@ func Debug(format string, args ...interface{}) {
 	if log.Level > DEBUG {
 		return
 	}
-	e := newEntry()
+	e := newEntry(DEBUG)
 	if stdout && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_NONE, 0x1B, DEFAULT_DEBUG_TIPS, 0x1B))
 	}
@@ -111,7 +113,7 @@ func Info(format string, args ...interface{}) {
 	if log.Level > INFO {
 		return
 	}
-	e := newEntry()
+	e := newEntry(INFO)
 	if stdout && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_GREEN, 0x1B, DEFAULT_INFO_TIPS, 0x1B))
 	}
@@ -123,7 +125,7 @@ func Warn(format string, args ...interface{}) {
 	if log.Level > WARN {
 		return
 	}
-	e := newEntry()
+	e := newEntry(WARN)
 	if stdout && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_YELLOW, 0x1B, DEFAULT_WARN_TIPS, 0x1B))
 	}
@@ -135,7 +137,7 @@ func Error(format string, args ...interface{}) {
 	if log.Level > ERROR {
 		return
 	}
-	e := newEntry()
+	e := newEntry(ERROR)
 	if stdout && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_RED, 0x1B, DEFAULT_ERROR_TIPS, 0x1B))
 	}
@@ -147,7 +149,7 @@ func Panic(format string, args ...interface{}) {
 	if log.Level > PANIC {
 		return
 	}
-	e := newEntry()
+	e := newEntry(PANIC)
 	if stdout && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_CLARET, 0x1B, DEFAULT_PANIC_TIPS, 0x1B))
 	}
@@ -160,7 +162,7 @@ func Fatal(format string, args ...interface{}) {
 	if log.Level > FATAL {
 		return
 	}
-	e := newEntry()
+	e := newEntry(FATAL)
 	if stdout && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_RED_YELLOW, 0x1B, DEFAULT_FATAL_TIPS, 0x1B))
 	}
