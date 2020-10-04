@@ -58,3 +58,11 @@ const (
 )
 
 const TIME_FORMAT  				= "2006-01-02 15:04:05"
+
+const (
+	ROTATE_MINITE				= "*/1 * * * *"
+	ROTATE_HOUR					= "0 * * * *"
+	ROTATE_DAY					= "0 0 * * *"
+	ROTATE_WEEK					= "0 0 * * 0"
+	ROTATE_MONTH				= "0 0 1 * *"
+)

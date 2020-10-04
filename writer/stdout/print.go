@@ -1,4 +1,4 @@
-package stdoutprinter
+package stdout
 
 import (
 	"fmt"

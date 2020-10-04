@@ -2,7 +2,7 @@ package log
 
 import (
 	"fmt"
-	"github.com/chi-chu/log/writer/stdoutprinter"
+	"github.com/chi-chu/log/writer/stdout"
 )
 
 type IPrint interface {
@@ -23,10 +23,10 @@ type logger struct {
 }
 
 var log *logger
-var stdout bool
+var stdoutPut bool
 func New(p IPrint) *logger {
-	if _, ok := p.(*stdoutprinter.Printer); ok {
-		stdout = true
+	if _, ok := p.(*stdout.Printer); ok {
+		stdoutPut = true
 	}
 	 err := p.Rotate()
 	 if err != nil {

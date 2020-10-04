@@ -1,4 +1,4 @@
-package fileprinter
+package file
 
 type RotateType string
 

@@ -1,4 +1,4 @@
-package fileprinter
+package file
 
 import (
 	"errors"
@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -19,7 +20,8 @@ type printer struct {
 	r			func(fileName string) (filename string)
 	cron		*cron.Cron
 	rotateFlag	bool
-	rotateType	RotateType
+	rotateType	string
+	lock		sync.RWMutex
 }
 
 func New(path string) (*printer, error) {
@@ -38,11 +40,13 @@ func New(path string) (*printer, error) {
 			return nil, errors.New("[log] error to mkdir path: "+dir+"   err: " + err.Error())
 		}
 	}
-	o := &printer{w: nil, fileName: fName, dir: dir, ext:ext, rotateType: ROTATE_DAY}
+	o := &printer{w: nil, fileName: fName, dir: dir, ext:ext, rotateType: string(ROTATE_DAY)}
 	return o, nil
 }
 
 func (p *printer) Print(data []byte) error {
+	p.lock.RLock()
+	defer p.lock.RUnlock()
 	_, err := fmt.Fprint(p.w, string(data))
 	return err
 }
@@ -50,13 +54,14 @@ func (p *printer) Print(data []byte) error {
 func (p *printer) Rotate() error {
 	if p.rotateFlag {
 		p.cron = cron.New()
-		_, err := p.cron.AddFunc(string(p.rotateType), func(){ _ = p.rotate()})
+		_, err := p.cron.AddFunc(p.rotateType, func(){ _ = p.rotate(false)})
 		if err != nil {
 			return err
 		}
-		return p.rotate()
+		p.cron.Start()
+		return p.rotate(true)
 	} else {
-		f, err := os.OpenFile(p.dir + string(os.PathSeparator) + p.fileName + p.ext, os.O_CREATE|os.O_WRONLY, 0666)
+		f, err := os.OpenFile(p.dir + string(os.PathSeparator) + p.fileName + p.ext, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			return err
 		}
@@ -65,7 +70,7 @@ func (p *printer) Rotate() error {
 	return nil
 }
 
-func (p *printer) SetRotatePlan(r RotateType) *printer {
+func (p *printer) SetRotatePlan(r string) *printer {
 	p.SetRotateFlag(true)
 	p.rotateType = r
 	return p
@@ -82,32 +87,31 @@ func (p *printer) SetRotateFunc(f func(string)string) *printer {
 	return p
 }
 
-func (p *printer) rotate() error {
+func (p *printer) rotate(first bool) error {
 	var fn string
 	if p.r != nil {
 		fn = p.r(p.fileName)
-		if fn == p.fileName {
+		if fn == p.fileName && !first {
 			return nil
-		} else {
-			fn = p.dir + string(os.PathSeparator) + fn + p.ext
+		} else if fn == "" {
+			return errors.New("[log]rotate func get nil string")
 		}
+		fn = p.dir + string(os.PathSeparator) + fn + p.ext
 	} else {
 		fn = p.defaultRotate()
 	}
-	if fn == "" {
-		return errors.New("[log]rotate func get nil string")
-	}
-	var f, o *os.File
+	var f *os.File
 	var err error
-	f, err = os.OpenFile(fn, os.O_CREATE|os.O_WRONLY, 0666)
+	f, err = os.OpenFile(fn, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		return err
 	}
+	p.lock.Lock()
 	if p.w != nil {
-		o = p.w.(*os.File)
-		defer o.Close()
+		p.w.(*os.File).Close()
 	}
 	p.w = f
+	p.lock.Unlock()
 	return nil
 }
 
@@ -119,5 +123,5 @@ func (p *printer) Exit() {
 }
 
 func (p *printer) defaultRotate() string {
-	return p.dir + string(os.PathSeparator) + p.fileName + "_" + time.Now().Format("200601021304") + p.ext
+	return p.dir + string(os.PathSeparator) + p.fileName + "_" + time.Now().Format("200601021504") + p.ext
 }

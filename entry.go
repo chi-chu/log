@@ -30,6 +30,7 @@ func newEntry(level Level) *Entry {
 	o := p.Get().(*Entry)
 	o.level = level
 	o.getCaller()
+	o.opHook()
 	return o
 }
 
@@ -40,6 +41,8 @@ func (e *Entry) release() {
 }
 
 func (e *Entry) getCaller() {
+	e.Data[TIPS_TIME] = time.Now().Format(TIME_FORMAT)
+	e.Data[TIPS_LEVEL] = levelTip[e.level]
 	if log.ReportCaller {
 		var funcName string
 		pc, filename, line, ok := runtime.Caller(DEFAULT_CALLER_TRACE + log.TraceSkip)
@@ -49,8 +52,6 @@ func (e *Entry) getCaller() {
 		e.Data[TIPS_FILE] = filename + ":" + strconv.Itoa(line)
 		e.Data[TIPS_FUNC] = funcName
 	}
-	e.Data[TIPS_TIME] = time.Now().Format(TIME_FORMAT)
-	e.Data[TIPS_LEVEL] = levelTip[e.level]
 }
 
 func (e *Entry) opHook() {
@@ -77,10 +78,21 @@ func (e *Entry) format(f string, args ...interface{}) []byte {
 		}
 		e.buf.WriteString(TIPS_MSG + ": ")
 		e.buf.WriteString(fmt.Sprintf(f, args...))
+		e.Data[TIPS_MSG] = fmt.Sprintf(f, args...)
+		for k, v := range e.Data {
+			if k == TIPS_TIME || k == TIPS_FUNC ||
+				k == TIPS_FILE || k == TIPS_MSG || k == TIPS_LEVEL{
+				continue
+			}
+			e.buf.WriteString(" ")
+			e.buf.WriteString(k)
+			e.buf.WriteString(":")
+			e.buf.WriteString(v)
+		}
 	} else if log.TextFormat == FORMAT_JSON {
 		e.Data[TIPS_MSG] = fmt.Sprintf(f, args...)
 		d, err := json.Marshal(e.Data)
-		if err != nil && !stdout {
+		if err != nil && !stdoutPut {
 			fmt.Println(err)
 		}
 		e.buf.Write(d)
@@ -91,7 +103,7 @@ func (e *Entry) format(f string, args ...interface{}) []byte {
 
 func (e *Entry) write() {
 	err := log.Out.Print(e.buf.Bytes())
-	if err != nil && !stdout {
+	if err != nil && !stdoutPut {
 		fmt.Println("[log] error to write err:", err)
 	}
 	e.release()
@@ -102,7 +114,7 @@ func Debug(format string, args ...interface{}) {
 		return
 	}
 	e := newEntry(DEBUG)
-	if stdout && log.WithColorTip{
+	if stdoutPut && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_NONE, 0x1B, DEFAULT_DEBUG_TIPS, 0x1B))
 	}
 	e.format(format, args...)
@@ -114,7 +126,7 @@ func Info(format string, args ...interface{}) {
 		return
 	}
 	e := newEntry(INFO)
-	if stdout && log.WithColorTip{
+	if stdoutPut && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_GREEN, 0x1B, DEFAULT_INFO_TIPS, 0x1B))
 	}
 	e.format(format, args...)
@@ -126,7 +138,7 @@ func Warn(format string, args ...interface{}) {
 		return
 	}
 	e := newEntry(WARN)
-	if stdout && log.WithColorTip{
+	if stdoutPut && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_YELLOW, 0x1B, DEFAULT_WARN_TIPS, 0x1B))
 	}
 	e.format(format, args...)
@@ -138,7 +150,7 @@ func Error(format string, args ...interface{}) {
 		return
 	}
 	e := newEntry(ERROR)
-	if stdout && log.WithColorTip{
+	if stdoutPut && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_RED, 0x1B, DEFAULT_ERROR_TIPS, 0x1B))
 	}
 	e.format(format, args...)
@@ -150,7 +162,7 @@ func Panic(format string, args ...interface{}) {
 		return
 	}
 	e := newEntry(PANIC)
-	if stdout && log.WithColorTip{
+	if stdoutPut && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_CLARET, 0x1B, DEFAULT_PANIC_TIPS, 0x1B))
 	}
 	e.format(format, args...)
@@ -163,7 +175,7 @@ func Fatal(format string, args ...interface{}) {
 		return
 	}
 	e := newEntry(FATAL)
-	if stdout && log.WithColorTip{
+	if stdoutPut && log.WithColorTip{
 		e.buf.WriteString(fmt.Sprintf(STDOUT_RED_YELLOW, 0x1B, DEFAULT_FATAL_TIPS, 0x1B))
 	}
 	e.format(format, args...)
