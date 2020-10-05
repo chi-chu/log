@@ -26,7 +26,7 @@ type logger struct {
 }
 
 var log *logger
-var newPrinter bool
+
 func init() {
 	log = &logger{
 		Out:          newStdout(),
@@ -42,12 +42,6 @@ func init() {
 func Opt(opt ...Option) {
 	for _, f := range opt {
 		f(log)
-	}
-	//to insure that the rotate action after user inject IPrint
-	if newPrinter {
-		for _, f := range opt {
-			f(log)
-		}
 	}
 }
 

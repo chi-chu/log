@@ -1,61 +1,94 @@
 package mysql
 
 import (
-	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/chi-chu/log/entry"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"sync"
+	"time"
 )
 
 type printer struct {
 	tableName			string
-	r					func(string)string
 	engine				*gorm.DB
-	rotate				bool
-	rotatePlan			string
 	tableMod			interface{}
+	pool				sync.Pool
 }
 
 func New(dsn string, tableName string, tableMod interface{}) (*printer, error) {
+	if tableName == "" {
+		return nil, errors.New("table name can`t be nil")
+	}
+	if tableMod == nil {
+		return nil, errors.New("tableMod can`t be nil")
+	}
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 	o := &printer{
 		tableName: tableName,
-		rotatePlan: "0 0 * * *",//default daily
 		engine: db,
 		tableMod: tableMod,
 	}
-	// 自动迁移模式
-	//db.AutoMigrate(&o.tableMod)
+	o.pool.New = func()interface{}{return make(map[string]interface{})}
 	return o, nil
 }
 
-func (p *printer) Print(data []byte) error {
+func (p *printer) Print(e *entry.Entry) {
 	o := p.tableMod
-	err := json.Unmarshal(data, &o)
-	if err != nil {
-		return err
+	//code to json and decode to struct test slowly
+	//t1 := time.Now().UnixNano()
+	//d, err := json.Marshal(e.Data)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//err = json.Unmarshal(d, &o)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//err = p.engine.Table(p.tableName).Create(o).Error
+	//if err!= nil {
+	//	fmt.Println("log insert into mysql err: ", err)
+	//}
+	//t2 := time.Now().UnixNano()
+
+	b := p.pool.Get().(map[string]interface{})
+	for k,v := range e.Data {
+		b[k] = v
 	}
-	return p.engine.Model(p.tableName).Create(&o).Error
+	fmt.Println(p.tableName)
+	err := p.engine.Table(p.tableName).Model(&o).Create(b).Error
+	if err != nil {
+		fmt.Println("log insert into mysql err: ", err)
+	}
+	p.pool.Put(b)
+	//fmt.Println(t2-t1,  time.Now().UnixNano() - t2)
 }
 
-func (p *printer) Rotate() error {
-
+func (p *printer) Rotate(b bool) error {
+	tName := p.tableName
+	if b {
+		tName = p.defaultRotate()
+	}
+	//create table
+	//exist table  check column
+	if !p.engine.Migrator().HasTable(tName) {
+		err := p.engine.Set("gorm:table_options","ENGINE=Archive").
+			Table(tName).Migrator().CreateTable(p.tableMod)
+		if err != nil {
+			return err
+		}
+	}
+	p.tableName = tName
 	return nil
 }
 
 func (p *printer) Exit() {
-
 }
 
-func (p *printer) SetRotateFlag(b bool) *printer {
-	p.rotate = b
-	return p
-}
-
-func (p *printer) SetRotatePlan(plan string) *printer {
-	p.rotate = true
-	p.rotatePlan = plan
-	return p
+func (p *printer) defaultRotate() string {
+	return p.tableName + "_" + time.Now().Format("200601021504")
 }

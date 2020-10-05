@@ -3,6 +3,7 @@ package log
 import (
 	"github.com/chi-chu/log/define"
 	"github.com/chi-chu/log/entry"
+	"os"
 )
 
 func Debug(format string, args ...interface{}) {
@@ -54,6 +55,7 @@ func Panic(format string, args ...interface{}) {
 	formatFunc[log.TextFormat](e, format, args...)
 	log.Out.Print(e)
 	e.Release()
+	os.Exit(1)
 }
 
 func Fatal(format string, args ...interface{}) {
@@ -64,4 +66,5 @@ func Fatal(format string, args ...interface{}) {
 	formatFunc[log.TextFormat](e, format, args...)
 	log.Out.Print(e)
 	e.Release()
+	os.Exit(1)
 }

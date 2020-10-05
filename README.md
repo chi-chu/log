@@ -60,8 +60,40 @@ and the file can be rotated by minute/ hour/ day/ week/ month/ year
 ```
 
 - **Mysql** :  
-```go
+    - it will Default use [Archive Engine](https://dev.mysql.com/doc/index-archive.html) to create table
+    - **__Attention__** it ues [gorm](https://github.com/go-gorm/gorm) to drive database  
+    you should give struct detail like this 
     
+    use: gorm:"size:128",json:"func"   
+    do not use: ~~json:"func",gorm:"size:128"~~
+```go
+    type LogModel struct {
+    	ID        	uint            `gorm:"primaryKey",json:"-"`
+    	Func		string          `gorm:"size:128",json:"func"`
+    	Line		string          `gorm:"size:64",json:"line"`
+    	File		string          `gorm:"size:256",json:"file"`
+    	Level		string          `gorm:"size:4",json:"level"`
+    	Time		string          `json:"time"`
+    	Msg	        string          `json:"msg"`
+    }
+    cf := &mysql.Config{"root", "123456", "127.0.0.1", 3306, "log"}
+    dsn := cf.String()
+    //or you can direct use the dsn url like
+    //  root:password@tcp(127.0.0.1:3306)/database?charset=utf8mb4&parseTime=True&loc=Local
+    w, err := mysql.New(dsn, "log", LogModel{})
+    if err != nil {
+        panic(err)
+    }
+    log.Opt(
+        log.SetLevel(define.DEBUG),
+        log.SetReportCaller(true),
+        log.SetFormat(log.FORMAT_JSON),
+        log.SetWriterAndRotate(w, true, log.ROTATE_DAY),
+        )
+    log.Debug("info test %s %d", "hahahahhaha", 123)
+    log.Info("info test %s %d", "hahahahhaha", 123)
+    log.Warn("warn test %s", "hahahahhaha")
+    log.Error("error test %s", "hahahahhaha")
 ```
 
 - **Mongo**

@@ -20,16 +20,19 @@ func formatText(e *entry.Entry, f string, args ...interface{}) {
 	e.Buf.WriteString(" ")
 	if log.ReportCaller {
 		e.Buf.WriteString(e.Data[define.TIPS_FILE])
+		e.Buf.WriteString(":")
+		e.Buf.WriteString(e.Data[define.TIPS_LINE])
 		e.Buf.WriteString(" ")
 		e.Buf.WriteString(e.Data[define.TIPS_FUNC])
 		e.Buf.WriteString(" ")
 	}
 	e.Buf.WriteString(define.TIPS_MSG + ": ")
 	e.Buf.WriteString(fmt.Sprintf(f, args...))
-	e.Data[define.TIPS_MSG] = fmt.Sprintf(f, args...)
+	//e.Data[define.TIPS_MSG] = fmt.Sprintf(f, args...)
 	for k, v := range e.Data {
 		if k == define.TIPS_TIME || k == define.TIPS_FUNC ||
-			k == define.TIPS_FILE || k == define.TIPS_MSG || k == define.TIPS_LEVEL {
+			k == define.TIPS_FILE || k == define.TIPS_MSG ||
+			k == define.TIPS_LEVEL || k == define.TIPS_LINE {
 			continue
 		}
 		e.Buf.WriteString(" ")

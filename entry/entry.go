@@ -58,7 +58,8 @@ func (e *Entry) getCaller() {
 	if ok {
 		funcName = strings.TrimPrefix(filepath.Ext(runtime.FuncForPC(pc).Name()), ".")
 	}
-	e.Data[define.TIPS_FILE] = filename + ":" + strconv.Itoa(line)
+	e.Data[define.TIPS_FILE] = filename
+	e.Data[define.TIPS_LINE] = strconv.Itoa(line)
 	e.Data[define.TIPS_FUNC] = funcName
 }
 

@@ -13,6 +13,7 @@ const (
 const (
 	TIPS_FUNC					= "func"
 	TIPS_FILE					= "file"
+	TIPS_LINE					= "line"
 	TIPS_TIME					= "time"
 	TIPS_LEVEL					= "level"
 	TIPS_MSG					= "msg"
