@@ -1,5 +1,5 @@
 # Log  
-![License](https://img.shields.io/:license-apache-blue.svg)  
+![License](https://img.shields.io/:license-apache-blue.svg)  ![Build Status](https://travis-ci.org/chi-chu/log.svg?branch=master)
 
 [中文文档](./README_CN.md)
 
