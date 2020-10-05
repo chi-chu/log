@@ -5,6 +5,15 @@
 
 this is log package for golang  
 it support stdout, file, mysql or other Database to write  
+and auto rotate like this, default daily
+```go
+|-- LogDir | Database  
+|   |-- logfile_2020101000.log | table
+|   |-- logfile_2020101100.log
+|   |-- logfile_2020101200.log
+|   |-- logfile_2020101300.log 
+|   |-- logfile_2020101400.log
+```
 **_SPECIAL_** it has some cool stdout like this below 
 
 ![Image text](example.png)  
@@ -28,7 +37,7 @@ this log will print in the shell
     //this code will set the option if you like
     //log.Opt(
     //  log.SetLevel(define.DEBUG),
-    //  log.SetReportCaller(true),
+    //  log.SetReportCaller(false),
     //  log.SetFormat(log.FORMAT_JSON),
     //  )
 
@@ -41,22 +50,14 @@ this log will print in the shell
 this log will be written in file  
 and the file can be rotated by minute/ hour/ day/ week/ month/ year 
 ```go
-    w, err := file.New("./test/test.log")
+    w, err := file.New("./LogDir/logfile.log")
     if err != nil {
         panic(err)
     }
     log.Opt(
-        log.SetLevel(define.DEBUG),
-        log.SetReportCaller(true),
-        log.SetFormat(log.FORMAT_JSON),
         log.SetWriterAndRotate(w, true, log.ROTATE_DAY),
     )
-    // default rotate func will generate filename like
-    //   logfile_20200101.log  logfile_20200102.log   logfile_20200103.log
-
     log.Info("info test %s %d", "hahahahhaha", 123)
-    log.Warn("warn test %s", "hahahahhaha")
-    log.Error("error test %s", "hahahahhaha")
 ```
 
 - **Mysql** :  
@@ -64,8 +65,8 @@ and the file can be rotated by minute/ hour/ day/ week/ month/ year
     - **__Attention__** it ues [gorm](https://github.com/go-gorm/gorm) to drive database  
     you should give struct detail like this 
     
-    use: gorm:"size:128",json:"func"   
-    do not use: ~~json:"func",gorm:"size:128"~~
+    remember to use: gorm:"size:128",json:"func"   
+    do not to use: ~~json:"func",gorm:"size:128"~~
 ```go
     type LogModel struct {
     	ID        	uint            `gorm:"primaryKey",json:"-"`
@@ -85,15 +86,9 @@ and the file can be rotated by minute/ hour/ day/ week/ month/ year
         panic(err)
     }
     log.Opt(
-        log.SetLevel(define.DEBUG),
-        log.SetReportCaller(true),
-        log.SetFormat(log.FORMAT_JSON),
         log.SetWriterAndRotate(w, true, log.ROTATE_DAY),
         )
     log.Debug("info test %s %d", "hahahahhaha", 123)
-    log.Info("info test %s %d", "hahahahhaha", 123)
-    log.Warn("warn test %s", "hahahahhaha")
-    log.Error("error test %s", "hahahahhaha")
 ```
 
 - **Mongo**
@@ -124,4 +119,5 @@ other writer needs to be developing
 #### other
 if you like this project star it  
 if you have any problem  
-please contract me at  544625106@qq.com
+please contract me at  544625106@qq.com  
+welcome to join and perfect it
