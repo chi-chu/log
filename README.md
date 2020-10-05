@@ -1,4 +1,6 @@
 # Log  
+![License](https://img.shields.io/:license-apache-blue.svg)  
+
 [中文文档](./README_CN.md)
 
 this is log package for golang  
@@ -20,14 +22,15 @@ import "github.com/chi-chu/log"
 ```
 
 ## Usage
-- **Stdout**  :  
+- **Stdout** (Default) :  
 this log will print in the shell
 ```go
-    w, _ := stdout.New()
-    log.New(w).SetFormat(log.FORMAT_JSON).SetReportCaller(true).SetLevel(log.DEBUG)
-
-    // if you don`t like the colorful log, use this code
-    // .SetColorTip(false)
+    //this code will set the option if you like
+    //log.Opt(
+    //  log.SetLevel(define.DEBUG),
+    //  log.SetReportCaller(true),
+    //  log.SetFormat(log.FORMAT_JSON),
+    //  )
 
     log.Info("info test %s %d", "hahahahhaha", 123)
     log.Warn("warn test %s", "hahahahhaha")
@@ -42,15 +45,15 @@ and the file can be rotated by minute/ hour/ day/ week/ month/ year
     if err != nil {
         panic(err)
     }
-    //if you set this, log file will be rotate  daily
-    w.SetRotateFlag(true).SetRotatePlan(log.ROTATE_DAY)
+    log.Opt(
+        log.SetLevel(define.DEBUG),
+        log.SetReportCaller(true),
+        log.SetFormat(log.FORMAT_JSON),
+        log.SetWriterAndRotate(w, true, log.ROTATE_DAY),
+    )
+    // default rotate func will generate filename like
+    //   logfile_20200101.log  logfile_20200102.log   logfile_20200103.log
 
-        // you may define your own rotate filename, use this code
-        // default rotate func will generate filename like
-        //   logfile_20200101.log  logfile_20200102.log   logfile_20200103.log
-        //.SetRotateFunc(func(s string) string{ return s})
-
-    log.New(w).SetFormat(log.FORMAT_JSON).SetReportCaller(true).SetLevel(log.DEBUG)
     log.Info("info test %s %d", "hahahahhaha", 123)
     log.Warn("warn test %s", "hahahahhaha")
     log.Error("error test %s", "hahahahhaha")
@@ -58,42 +61,12 @@ and the file can be rotated by minute/ hour/ day/ week/ month/ year
 
 - **Mysql** :  
 ```go
-    w, err := mysql.New("./test/test.log")
-    if err != nil {
-        panic(err)
-    }
-    //if you set this, log file will be rotate  daily
-    w.SetRotateFlag(true).SetRotatePlan(log.ROTATE_DAY)
-
-        // you may define your own rotate filename, use this code
-        // default rotate func will generate filename like
-        //   logfile_20200101.log  logfile_20200102.log   logfile_20200103.log
-        //.SetRotateFunc(func(s string) string{ return s})
-
-    log.New(w).SetFormat(log.FORMAT_JSON).SetReportCaller(true).SetLevel(log.DEBUG)
-    log.Info("info test %s %d", "hahahahhaha", 123)
-    log.Warn("warn test %s", "hahahahhaha")
-    log.Error("error test %s", "hahahahhaha")
+    
 ```
 
 - **Mongo**
 ```go
-    w, err := mongo.New("./test/test.log")
-    if err != nil {
-        panic(err)
-    }
-    //if you set this, log file will be rotate  daily
-    w.SetRotateFlag(true).SetRotatePlan(log.ROTATE_DAY)
-
-        // you may define your own rotate filename, use this code
-        // default rotate func will generate filename like
-        //   logfile_20200101.log  logfile_20200102.log   logfile_20200103.log
-        //.SetRotateFunc(func(s string) string{ return s})
-
-    log.New(w).SetFormat(log.FORMAT_JSON).SetReportCaller(true).SetLevel(log.DEBUG)
-    log.Info("info test %s %d", "hahahahhaha", 123)
-    log.Warn("warn test %s", "hahahahhaha")
-    log.Error("error test %s", "hahahahhaha")
+   
 ```
 other writer needs to be developing  
   
@@ -107,13 +80,13 @@ other writer needs to be developing
     type hook struct {
     }
 
-    func(h *hooktest) Set(e *log.Entry) {
+    func(h *hook) Set(e *log.Entry) {
     	e.Data["heelow"] = "just show your time"
     	e.Data["findasf"] = "123144"
     	e.Data["8888"] = "8888"
     }
 
-    log.New(obj).SetHook(&hook{})
+    log.Opt(log.SetHook(&hook{})
 ```
 
 #### other

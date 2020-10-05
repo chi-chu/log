@@ -1,5 +1,4 @@
-package log
-
+package entry
 
 type Hook interface {
 	Set(*Entry)

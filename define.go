@@ -1,7 +1,9 @@
 package log
 
+import "github.com/chi-chu/log/define"
+
 const (
-	STDOUT_NONE					= "%s"
+	STDOUT_NONE					= "%c【%s%c"
 	STDOUT_GREEN				= "%c[1;40;32m%s%c[0m"
 	STDOUT_YELLOW				= "%c[1;40;33m%s%c[0m"
 	STDOUT_RED					= "%c[1;40;31m%s%c[0m"
@@ -9,25 +11,13 @@ const (
 	STDOUT_RED_YELLOW			= "%c[1;41;33m%s%c[0m"
 )
 
-type Level int
-type FormatType int
-
-const (
-	DEBUG				Level 	= 0
-	INFO				Level	= 1
-	WARN				Level	= 2
-	ERROR				Level	= 3
-	PANIC				Level	= 4
-	FATAL				Level	= 5
-)
-
-var levelTip = map[Level]string{
-	DEBUG:		"debug",
-	INFO:		"info",
-	WARN:		"warn",
-	ERROR:		"error",
-	PANIC:		"panic",
-	FATAL:		"fatal",
+var stdoutColor = map[define.Level]string{
+	define.DEBUG:	STDOUT_NONE,
+	define.INFO:	STDOUT_GREEN,
+	define.WARN:	STDOUT_YELLOW,
+	define.ERROR:	STDOUT_RED,
+	define.PANIC:	STDOUT_CLARET,
+	define.FATAL:	STDOUT_RED_YELLOW,
 }
 
 const (
@@ -39,25 +29,21 @@ const (
 	DEFAULT_FATAL_TIPS			= "【FATAL】"
 )
 
-const (
-	DEFAULT_CALLER_TRACE		= 3
-)
+var stdoutMsg = map[define.Level]string{
+	define.DEBUG:	DEFAULT_DEBUG_TIPS,
+	define.INFO:	DEFAULT_INFO_TIPS,
+	define.WARN:	DEFAULT_WARN_TIPS,
+	define.ERROR:	DEFAULT_ERROR_TIPS,
+	define.PANIC:	DEFAULT_PANIC_TIPS,
+	define.FATAL:	DEFAULT_FATAL_TIPS,
+}
 
+type FormatType int
 const (
 	FORMAT_NONE	FormatType		= 0
 	FORMAT_TEXT	FormatType		= 1
 	FORMAT_JSON	FormatType		= 2
 )
-
-const (
-	TIPS_FUNC					= "func"
-	TIPS_FILE					= "file"
-	TIPS_TIME					= "time"
-	TIPS_LEVEL					= "level"
-	TIPS_MSG					= "msg"
-)
-
-const TIME_FORMAT  				= "2006-01-02 15:04:05"
 
 const (
 	ROTATE_MINITE				= "*/1 * * * *"
