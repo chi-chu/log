@@ -95,6 +95,11 @@ and the file can be rotated by minute/ hour/ day/ week/ month/ year
 ```go
    
 ```
+
+- **ElasticSearch**
+```go
+   
+```
 other writer needs to be developing  
   
   

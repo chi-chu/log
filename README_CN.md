@@ -99,6 +99,10 @@ import "github.com/chi-chu/log"
 ```go
    
 ```
+- **ElasticSearch**
+```go
+   
+```
 其他日志驱动正在集成中。。。。
   
   

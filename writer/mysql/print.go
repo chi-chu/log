@@ -12,6 +12,7 @@ import (
 
 type printer struct {
 	tableName			string
+	rotateName			string
 	engine				*gorm.DB
 	tableMod			interface{}
 	pool				sync.Pool
@@ -59,8 +60,7 @@ func (p *printer) Print(e *entry.Entry) {
 	for k,v := range e.Data {
 		b[k] = v
 	}
-	fmt.Println(p.tableName)
-	err := p.engine.Table(p.tableName).Model(&o).Create(b).Error
+	err := p.engine.Table(p.rotateName).Model(&o).Create(b).Error
 	if err != nil {
 		fmt.Println("log insert into mysql err: ", err)
 	}
@@ -69,20 +69,20 @@ func (p *printer) Print(e *entry.Entry) {
 }
 
 func (p *printer) Rotate(b bool) error {
-	tName := p.tableName
+	rotateName := p.tableName
 	if b {
-		tName = p.defaultRotate()
+		rotateName = p.defaultRotate()
 	}
 	//create table
 	//exist table  check column
-	if !p.engine.Migrator().HasTable(tName) {
+	if !p.engine.Migrator().HasTable(rotateName) {
 		err := p.engine.Set("gorm:table_options","ENGINE=Archive").
-			Table(tName).Migrator().CreateTable(p.tableMod)
+			Table(rotateName).Migrator().CreateTable(p.tableMod)
 		if err != nil {
 			return err
 		}
 	}
-	p.tableName = tName
+	p.rotateName = rotateName
 	return nil
 }
 

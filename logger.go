@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"github.com/chi-chu/log/define"
 	"github.com/chi-chu/log/entry"
 	"github.com/robfig/cron/v3"
@@ -23,6 +24,7 @@ type logger struct {
 	RotateFlag	 bool
 	RotateType	 string
 	cron		 *cron.Cron
+	errFunc		 func(error)
 }
 
 var log *logger
@@ -36,6 +38,7 @@ func init() {
 		Level:        define.DEBUG,
 		RotateFlag:	  false,
 		RotateType:	  ROTATE_DAY,
+		errFunc:	  func(err error){fmt.Println(err)},
 	}
 }
 
@@ -49,24 +52,24 @@ func SetWriterAndRotate(print IPrint, on bool, rotateType string) Option {
 	return func(l *logger) {
 		l.Out = print
 		l.RotateFlag = on
-		if rotateType != "" {
+		if rotateType == "" {
 			rotateType = ROTATE_DAY
 		}
 		l.RotateType = rotateType
 		err := log.Out.Rotate(on)
 		if err != nil {
-			Error("log rotate err: ", err)
+			fmt.Println(err)
 		}
 		if on {
 			log.cron = cron.New()
 			_, err := log.cron.AddFunc(rotateType, func() {
 				err := log.Out.Rotate(on)
 				if err != nil {
-					Error("log rotate err: ", err)
+					fmt.Println(err)
 				}
 			})
 			if err != nil {
-				Error("log rotate err: ", err)
+				fmt.Println(err)
 				return
 			}
 			l.cron.Start()
@@ -97,6 +100,12 @@ func SetReportCaller(on bool) Option {
 		l.ReportCaller = on
 	}
 }
+
+//func SetErrorFunc(errFunc func(error)) Option {
+//	return func(l *logger) {
+//		l.errFunc = errFunc
+//	}
+//}
 
 func Exit() {
 	if log.cron != nil {

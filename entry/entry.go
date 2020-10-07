@@ -3,6 +3,7 @@ package entry
 import (
 	"bytes"
 	"github.com/chi-chu/log/define"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 	"time"
 )
 const (
-	DEFAULT_CALLER_TRACE		= 3
+	default_caller_trace		= 3
 )
 
 var levelTip = map[define.Level]string{
@@ -24,7 +25,8 @@ var levelTip = map[define.Level]string{
 }
 
 var p sync.Pool
-
+var doOnce sync.Once
+var projectPath int
 type Entry struct {
 	Data  map[string]string
 	Level define.Level
@@ -38,6 +40,24 @@ func init() {
 }
 
 func NewEntry(level define.Level) *Entry {
+	//use go.mod file to check this project...
+	//maybe its not perfect
+	doOnce.Do(func(){
+		_, filename, _, ok := runtime.Caller(default_caller_trace+2)
+		if ok {
+			for {
+				filename = filepath.Dir(filename)
+				if filename == string(os.PathSeparator) {
+					break
+				} else {
+					_, err := os.Stat(filename + string(os.PathSeparator) + "go.mod")
+					if err == nil {
+						projectPath = len(filepath.Dir(filename))
+					}
+				}
+			}
+		}
+	})
 	o := p.Get().(*Entry)
 	o.Level = level
 	o.Data[define.TIPS_LEVEL] = levelTip[level]
@@ -54,11 +74,11 @@ func (e *Entry) Release() {
 
 func (e *Entry) getCaller() {
 	var funcName string
-	pc, filename, line, ok := runtime.Caller(DEFAULT_CALLER_TRACE)
+	pc, filename, line, ok := runtime.Caller(default_caller_trace)
 	if ok {
 		funcName = strings.TrimPrefix(filepath.Ext(runtime.FuncForPC(pc).Name()), ".")
 	}
-	e.Data[define.TIPS_FILE] = filename
+	e.Data[define.TIPS_FILE] = filename[projectPath:]
 	e.Data[define.TIPS_LINE] = strconv.Itoa(line)
 	e.Data[define.TIPS_FUNC] = funcName
 }

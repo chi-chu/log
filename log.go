@@ -22,6 +22,7 @@ func Info(format string, args ...interface{}) {
 		return
 	}
 	e := entry.NewEntry(define.INFO)
+	e.Hook(log.Hook)
 	formatFunc[log.TextFormat](e, format, args...)
 	log.Out.Print(e)
 	e.Release()
@@ -32,6 +33,7 @@ func Warn(format string, args ...interface{}) {
 		return
 	}
 	e := entry.NewEntry(define.WARN)
+	e.Hook(log.Hook)
 	formatFunc[log.TextFormat](e, format, args...)
 	log.Out.Print(e)
 	e.Release()
@@ -42,6 +44,7 @@ func Error(format string, args ...interface{}) {
 		return
 	}
 	e := entry.NewEntry(define.ERROR)
+	e.Hook(log.Hook)
 	formatFunc[log.TextFormat](e, format, args...)
 	log.Out.Print(e)
 	e.Release()
@@ -52,6 +55,7 @@ func Panic(format string, args ...interface{}) {
 		return
 	}
 	e := entry.NewEntry(define.PANIC)
+	e.Hook(log.Hook)
 	formatFunc[log.TextFormat](e, format, args...)
 	log.Out.Print(e)
 	e.Release()
@@ -63,6 +67,7 @@ func Fatal(format string, args ...interface{}) {
 		return
 	}
 	e := entry.NewEntry(define.FATAL)
+	e.Hook(log.Hook)
 	formatFunc[log.TextFormat](e, format, args...)
 	log.Out.Print(e)
 	e.Release()
