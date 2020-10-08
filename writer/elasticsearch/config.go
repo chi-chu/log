@@ -36,7 +36,7 @@ var defaultFieldMap = map[string]*Field{
 	define.TIPS_FUNC:	&Field{Type:"text"},
 	define.TIPS_LINE:	&Field{Type:"text"},
 	define.TIPS_MSG:	&Field{Type:"keyword"},
-	define.TIPS_TIME:	&Field{Type:"keyword", Format:"yyyy-MM-dd HH:mm:ss"},
+	define.TIPS_TIME:	&Field{Type:"date", Format:"yyyy-MM-dd HH:mm:ss"},
 }
 
 var defaultConfig = &EsConfig{
@@ -73,11 +73,11 @@ func SetReplicas(num int) Option {
 	}
 }
 
-func SetBulk(b bool) Option {
-	return func(cf *EsConfig) {
-		cf.bulkInsert = b
-	}
-}
+//func SetBulk(b bool) Option {
+//	return func(cf *EsConfig) {
+//		cf.bulkInsert = b
+//	}
+//}
 
 func SetAddField(column string, field *Field) Option {
 	return func(cf *EsConfig) {

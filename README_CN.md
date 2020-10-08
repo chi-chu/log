@@ -124,8 +124,6 @@ import "github.com/chi-chu/log"
     log.Opt(log.SetHook(&hook{})
 ```
 
-#### 其他
-万水千山总是情，给个Star行不行？  
-人间自有真情在，给个Star也是爱。  
+#### 其他  
 如果有任何问题，请联系我 544625106@qq.com  
 欢迎加入一起开发。

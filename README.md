@@ -121,8 +121,7 @@ other writer needs to be developing
     log.Opt(log.SetHook(&hook{})
 ```
 
-#### other
-if you like this project star it  
+#### other 
 if you have any problem  
 please contract me at  544625106@qq.com  
 welcome to join and perfect it
