@@ -98,9 +98,9 @@ import "github.com/chi-chu/log"
 - **Mongo**  
     需要MongoDB 2.6 或者更高的版本
 ```go
-   a := mongo.Config{"root","123456","localhost",0,"log"}
-   // 也可以直接使用dns连接
-   //dns := "mongodb://localhost:27017
+    a := mongo.Config{"root","123456","localhost",0,"log"}
+    // 也可以直接使用dns连接
+    //dns := "mongodb://localhost:27017 
     //dns := "mongodb://root:123456@localhost:27017/log?authSource=log"
     w, err := mongo.New(a.String(), "log","testlog")
     if err != nil {
