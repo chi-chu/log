@@ -97,17 +97,17 @@ require MongoDB 2.6 and higher.
     a := mongo.Config{"root","123456","localhost",0,"log"}
     // you can also use dsn to connect
     //dns := "mongodb://localhost:27017
-   	//dns := "mongodb://root:123456@localhost:27017/log?authSource=log"
-   	w, err := mongo.New(a.String(), "log","testlog")
-   	if err != nil {
-   		panic(err)
-   	}
-   	log.Opt(
-   		log.SetLevel(define.DEBUG),
-   		log.SetWriterAndRotate(w, true, log.ROTATE_MINITE),
-   		)
-   	log.Debug("debug test %s %d", "hahahahhaha", 123)
-   	log.Info("info test %s", "hahahahhaha")
+    //dns := "mongodb://root:123456@localhost:27017/log?authSource=log" 
+    w, err := mongo.New(a.String(), "log","testlog")
+    if err != nil {
+        panic(err)
+    }
+    log.Opt(
+        log.SetLevel(define.DEBUG),
+        log.SetWriterAndRotate(w, true, log.ROTATE_MINITE),
+        )
+    log.Debug("debug test %s %d", "hahahahhaha", 123)
+    log.Info("info test %s", "hahahahhaha")
 ```
 
 - **ElasticSearch**  

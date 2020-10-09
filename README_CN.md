@@ -117,7 +117,7 @@ import "github.com/chi-chu/log"
 需要 ElasticSearch 7.x
 批量写入的api正在研究中。。。
 ```go
-   w, err := elasticsearch.New([]string{"http://127.0.0.1:9200", "http://127.0.0.2:9200"}, "log",
+    w, err := elasticsearch.New([]string{"http://127.0.0.1:9200", "http://127.0.0.2:9200"}, "log",
         //elasticsearch.SetReplicas(4),
         elasticsearch.SetShards(3),
         )
