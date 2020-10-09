@@ -3,7 +3,7 @@ package log
 import "github.com/chi-chu/log/define"
 
 const (
-	STDOUT_NONE					= "%c【%s%c"
+	STDOUT_NONE					= "%c[1;40;37m%s%c[0m"
 	STDOUT_GREEN				= "%c[1;40;32m%s%c[0m"
 	STDOUT_YELLOW				= "%c[1;40;33m%s%c[0m"
 	STDOUT_RED					= "%c[1;40;31m%s%c[0m"
@@ -22,8 +22,8 @@ var stdoutColor = map[define.Level]string{
 
 const (
 	DEFAULT_DEBUG_TIPS			= "【DEBUG】"
-	DEFAULT_INFO_TIPS			= "【INFO】 "
-	DEFAULT_WARN_TIPS			= "【WARN】 "
+	DEFAULT_INFO_TIPS			= "【INFO 】"
+	DEFAULT_WARN_TIPS			= "【WARN 】"
 	DEFAULT_ERROR_TIPS			= "【ERROR】"
 	DEFAULT_PANIC_TIPS			= "【PANIC】"
 	DEFAULT_FATAL_TIPS			= "【FATAL】"

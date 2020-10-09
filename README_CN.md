@@ -95,13 +95,41 @@ import "github.com/chi-chu/log"
     log.Debug("info test %s %d", "hahahahhaha", 123)
 ```
 
-- **Mongo**
+- **Mongo**  
+    需要MongoDB 2.6 或者更高的版本
 ```go
-   
+   a := mongo.Config{"root","123456","localhost",0,"log"}
+   // 也可以直接使用dns连接
+   //dns := "mongodb://localhost:27017
+    //dns := "mongodb://root:123456@localhost:27017/log?authSource=log"
+    w, err := mongo.New(a.String(), "log","testlog")
+    if err != nil {
+        panic(err)
+    }
+    log.Opt(
+        log.SetLevel(define.DEBUG),
+        log.SetWriterAndRotate(w, true, log.ROTATE_MINITE),
+        )
+    log.Debug("debug test %s %d", "hahahahhaha", 123)
+    log.Info("info test %s", "hahahahhaha")
 ```
-- **ElasticSearch**
+- **ElasticSearch**  
+需要 ElasticSearch 7.x
+批量写入的api正在研究中。。。
 ```go
-   
+   w, err := elasticsearch.New([]string{"http://127.0.0.1:9200", "http://127.0.0.2:9200"}, "log",
+        //elasticsearch.SetReplicas(4),
+        elasticsearch.SetShards(3),
+        )
+    if err != nil {
+        panic(err)
+    }
+    log.Opt(
+        log.SetWriterAndRotate(w, false, log.ROTATE_DAY),
+    )
+    log.Debug("debug test %s %d", "hahahahhaha", 123)
+    log.Info("info test %s", "hahahahhaha")
+    log.Warn("warn test %s", "hahahahhaha")
 ```
 其他日志驱动正在集成中。。。。
   

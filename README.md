@@ -91,14 +91,42 @@ and the file can be rotated by minute/ hour/ day/ week/ month/ year
     log.Debug("info test %s %d", "hahahahhaha", 123)
 ```
 
-- **Mongo**
+- **Mongo**  
+require MongoDB 2.6 and higher.
 ```go
-   
+    a := mongo.Config{"root","123456","localhost",0,"log"}
+    // you can also use dsn to connect
+    //dns := "mongodb://localhost:27017
+   	//dns := "mongodb://root:123456@localhost:27017/log?authSource=log"
+   	w, err := mongo.New(a.String(), "log","testlog")
+   	if err != nil {
+   		panic(err)
+   	}
+   	log.Opt(
+   		log.SetLevel(define.DEBUG),
+   		log.SetWriterAndRotate(w, true, log.ROTATE_MINITE),
+   		)
+   	log.Debug("debug test %s %d", "hahahahhaha", 123)
+   	log.Info("info test %s", "hahahahhaha")
 ```
 
-- **ElasticSearch**
+- **ElasticSearch**  
+require ElasticSearch 7.x and higher.  
+bulk insert is  developing...
 ```go
-   
+   w, err := elasticsearch.New([]string{"http://127.0.0.1:9200", "http://127.0.0.2:9200"}, "log",
+   		//elasticsearch.SetReplicas(4),
+   		elasticsearch.SetShards(3),
+   		)
+   	if err != nil {
+   		panic(err)
+   	}
+   	log.Opt(
+   		log.SetWriterAndRotate(w, false, log.ROTATE_DAY),
+   	)
+   	log.Debug("debug test %s %d", "hahahahhaha", 123)
+   	log.Info("info test %s", "hahahahhaha")
+   	log.Warn("warn test %s", "hahahahhaha")
 ```
 other writer needs to be developing  
   
