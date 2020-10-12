@@ -73,11 +73,11 @@ func SetReplicas(num int) Option {
 	}
 }
 
-//func SetBulk(b bool) Option {
-//	return func(cf *EsConfig) {
-//		cf.bulkInsert = b
-//	}
-//}
+func SetBulk(b bool) Option {
+	return func(cf *EsConfig) {
+		cf.bulkInsert = b
+	}
+}
 
 func SetAddField(column string, field *Field) Option {
 	return func(cf *EsConfig) {

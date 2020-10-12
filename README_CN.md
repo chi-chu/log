@@ -114,11 +114,11 @@ import "github.com/chi-chu/log"
     log.Info("info test %s", "hahahahhaha")
 ```
 - **ElasticSearch**  
-需要 ElasticSearch 7.x
-批量写入的api正在研究中。。。
+需要 ElasticSearch 7.x  
 ```go
     w, err := elasticsearch.New([]string{"http://127.0.0.1:9200", "http://127.0.0.2:9200"}, "log",
         //elasticsearch.SetReplicas(4),
+        elasticsearch.SetBulk(true), //开启批量写入
         elasticsearch.SetShards(3),
         )
     if err != nil {
@@ -130,6 +130,9 @@ import "github.com/chi-chu/log"
     log.Debug("debug test %s %d", "hahahahhaha", 123)
     log.Info("info test %s", "hahahahhaha")
     log.Warn("warn test %s", "hahahahhaha")
+    // 如果你使用的是  Bulk 批量写入
+    //在程序退出之前 请调用Exit， 否则可能丢失部分日志
+    log.Exit()
 ```
 其他日志驱动正在集成中。。。。
   

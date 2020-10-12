@@ -77,11 +77,11 @@ func (p *printer) Rotate(b bool) error {
 		logArr := p.docSlice
 		p.docSlice = make([]map[string]string, 0, default_cache_size)
 		if len(logArr) > 0 {
-			req := elastic.NewBulkIndexRequest().Index(oldIndex)
+			bulkReq := p.client.Bulk()
 			for _, log := range logArr {
-				req = req.Doc(log)
+				bulkReq.Add(elastic.NewBulkIndexRequest().Index(oldIndex).Doc(log))
 			}
-			rsp ,err := p.client.Bulk().Add(req).Do(context.Background())
+			rsp ,err := bulkReq.Do(context.Background())
 			if err != nil {
 				return err
 			}
@@ -127,14 +127,12 @@ func (p *printer) sendOnce() {
 		return
 	}
 	//something wrong
-	reqArr := make([]elastic.BulkableRequest, len(p.docSlice))
+	bulkReq := p.client.Bulk()
 	for _, log := range p.docSlice {
-		reqArr = append(reqArr, elastic.NewBulkIndexRequest().Index(p.rotateIndexName).Doc(log))
+		bulkReq.Add(elastic.NewBulkIndexRequest().Index(p.rotateIndexName).Doc(log))
 	}
-	fmt.Println(reqArr)
-	fmt.Println("  ")
 	p.docSlice = make([]map[string]string, 0, default_cache_size)
-	rsp ,err := elastic.NewBulkService(p.client).Add(reqArr...).Do(context.Background())
+	rsp ,err := bulkReq.Do(context.Background())
 	if err != nil {
 		fmt.Println("[log] bulk insert error ", err)
 		return

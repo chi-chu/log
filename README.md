@@ -112,10 +112,10 @@ require MongoDB 2.6 and higher.
 
 - **ElasticSearch**  
 require ElasticSearch 7.x and higher.  
-bulk insert is  developing...
 ```go
     w, err := elasticsearch.New([]string{"http://127.0.0.1:9200", "http://127.0.0.2:9200"}, "log", 
-    //elasticsearch.SetReplicas(4),
+        //elasticsearch.SetReplicas(4),
+        elasticsearch.SetBulk(true),  //use Bulk mode
         elasticsearch.SetShards(3),
         )
     if err != nil {
@@ -127,6 +127,10 @@ bulk insert is  developing...
     log.Debug("debug test %s %d", "hahahahhaha", 123)
     log.Info("info test %s", "hahahahhaha")
     log.Warn("warn test %s", "hahahahhaha")
+    // if you use  Bulk mode
+    // when service is done, do not forget to exit()
+    // otherwise  you may  lost some logs
+    log.Exit()
 ```
 other writer needs to be developing  
   
