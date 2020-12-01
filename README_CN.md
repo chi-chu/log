@@ -69,15 +69,13 @@ import "github.com/chi-chu/log"
     - 默认使用 [Archive 引擎](https://dev.mysql.com/doc/index-archive.html) 来创建表
     - **__注意：__** 目前使用 [gorm](https://github.com/go-gorm/gorm) 驱动来写入mysql数据库  
     你应该创建日志相对应的struct结构，gorm标签应该置前，如下示例  
-    标签应使用书写 : gorm:"size:128",json:"func"   
-    这种情况将报错 : ~~json:"func",gorm:"size:128"~~
 ```go
     type LogModel struct {
-    	ID        	uint            `gorm:"primaryKey",json:"-"`
-    	Func		string          `gorm:"size:128",json:"func"`
-    	Line		string          `gorm:"size:64",json:"line"`
-    	File		string          `gorm:"size:256",json:"file"`
-    	Level		string          `gorm:"size:4",json:"level"`
+    	ID        	uint            `gorm:"primaryKey" json:"-"`
+    	Func		string          `gorm:"size:128" json:"func"`
+    	Line		string          `gorm:"size:64" json:"line"`
+    	File		string          `gorm:"size:256" json:"file"`
+    	Level		string          `gorm:"size:4" json:"level"`
     	Time		string          `json:"time"`
     	Msg	        string          `json:"msg"`
     }

@@ -64,16 +64,13 @@ and the file can be rotated by minute/ hour/ day/ week/ month/ year
     - it will Default use [Archive Engine](https://dev.mysql.com/doc/index-archive.html) to create table
     - **__Attention__** it ues [gorm](https://github.com/go-gorm/gorm) to drive database  
     you should give struct detail like this 
-    
-    remember to use: gorm:"size:128",json:"func"   
-    do not to use: ~~json:"func",gorm:"size:128"~~
 ```go
     type LogModel struct {
-    	ID        	uint            `gorm:"primaryKey",json:"-"`
-    	Func		string          `gorm:"size:128",json:"func"`
-    	Line		string          `gorm:"size:64",json:"line"`
-    	File		string          `gorm:"size:256",json:"file"`
-    	Level		string          `gorm:"size:4",json:"level"`
+    	ID        	uint            `gorm:"primaryKey" json:"-"`
+    	Func		string          `gorm:"size:128" json:"func"`
+    	Line		string          `gorm:"size:64" json:"line"`
+    	File		string          `gorm:"size:256" json:"file"`
+    	Level		string          `gorm:"size:4" json:"level"`
     	Time		string          `json:"time"`
     	Msg	        string          `json:"msg"`
     }
